@@ -2,6 +2,9 @@ const express = require("express");
 const https = require("https")
 app=express();
 
+app.set('view engine', 'ejs');
+
+
 const url = "https://api.wisetrout.net/jsonapi/node/page";
 
 app.listen(3000, function(){
@@ -17,13 +20,13 @@ app.get("/", function(req, res){
       const APIdata = JSON.parse(data) //Sometimes works and sometimes doesn't, why?
       console.log(APIdata);
       for(let i = 0; i<APIdata.data.length; i++){
-        const name = APIdata.data[i].attributes.title;
-        articles.push(name);
+        const article = {
+          name: APIdata.data[i].attributes.title,
+          id: APIdata.data[i].id};
+        articles.push(article);
       }
-      res.send("<h1>Article list:</h1><br>" + articles[0] + "<br>" + articles[1]); //can this be done using promises?
+      res.render('mainPage', {articleList: articles}); //can this be done using promises?
       //https.get is async, res.send should be executed after https.get has finished
     });
   })
-
-
 })
