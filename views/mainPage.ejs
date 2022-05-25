@@ -7,7 +7,7 @@
   <body>
     Article list:
     <% for(i=0; i<articleList.length; i++) { %>
-      <br /> <a href="/page/<%= articleList[i].id %>"> <%= articleList[i].name %> </a>
+      <%- include("shortArticle", {articleName: articleList[i].name, articleContent: articleList[i].content, articleId: articleList[i].id}); -%>
     <% } %>
   </body>
 </html>
