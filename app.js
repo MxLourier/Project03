@@ -40,6 +40,9 @@ app.get("/", function(req, res) {
         res.render('mainPage', {
           articleList: articles
         });
+        articles = [];
+        //without this line every time the main page is refreshed
+        //articles keep being added to article list again
 
       } catch (e) {
         console.error(e.message);
@@ -49,11 +52,37 @@ app.get("/", function(req, res) {
 })
 
 app.get("/page/:id", function(req, res) {
-  //show page of the article that has an id equal to <:id>
-  const requestedArticleId = req.params.id;
-  chosenArticle = articles.find(element => element.id === requestedArticleId);
-  res.render("longArticle", {
-    articleName: chosenArticle.name,
-    articleContent: chosenArticle.content
-  })
-})
+      //show page of the article that has an id equal to <:id>
+      const requestedArticleId = req.params.id;
+      https.get(url + "/" + requestedArticleId, function(response) {
+      //getting article content and article name again (not using old values
+      // from get("/")). This is done in order to
+      //a) refresh article content (in case there was a change after user
+      // requested main page) - caching
+      //b)get full article content - in case of a long article content requesting
+      // article content by using simply https.get(url) will only give us a summary
+      //of body.value
+
+          var APIdata = {};
+          var rawData = "";
+          response.on('data', (chunk) => {
+            rawData += chunk;
+          });
+          // HTTP response object can receive multiple 'data' events,
+          //each time getting only chunk of the full data
+          // used example from https://nodejs.org/api/http.html ("http.get")
+          //to accumulate data events
+          response.on('end', () => {
+              try {
+                APIdata = JSON.parse(rawData);
+                res.render('longArticle', {
+                    articleName: APIdata.data.attributes.title,
+                    articleContent: APIdata.data.attributes.body.value
+                  });
+                }
+                catch (e) {
+                  console.error(e.message);
+                }
+              })
+          })
+      })
