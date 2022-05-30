@@ -1,4 +1,7 @@
-<h1><%= articleName %> </h1>
+<% const maxLength = 1000; %>
+
+<h1> <a href="/page/<%= articleId %>"><%= articleName %></a> </h1>
 <p>
-  <%=articleContent%>
+  <% const a = articleContent.slice(0,maxLength);  %>
+  <%- a %>
 </p>
